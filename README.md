@@ -91,13 +91,43 @@ cd gateway-server
 
 이 서비스에는 비밀 값이 없습니다. 토큰 검증에 쓰는 것은 **공개키**이며 config 저장소에 들어 있습니다. 서명을 만드는 개인키는 인증 서비스만 가지고 있고 환경변수로 주입합니다.
 
-### 2-3. 기동 순서
+### 2-3. 컨테이너로 띄우기
+
+`infra` 저장소의 Compose에 `platform` 프로파일이 있습니다. 도메인 서비스를 개발할 때는 **플랫폼을 컨테이너로 두고 작업 중인 서비스만 개발 도구에서 실행하는 조합**이 편합니다.
+
+```powershell
+cd ..\infra
+docker compose --profile infra --profile platform up -d
+docker compose ps
+```
+
+이 서비스는 앞의 둘이 준비될 때까지 기다렸다가 뜹니다. `STATUS` 가 `(healthy)` 로 바뀌면 준비된 것입니다.
+
+이미지는 ghcr에서 받아 오며, 코드를 고쳤다면 먼저 다시 만들어 올려야 합니다. 그 절차는 `infra` 저장소 README에 있습니다.
+
+```powershell
+.\gradlew clean build
+docker build -t ghcr.io/paw-trail/gateway-server:latest .
+docker push ghcr.io/paw-trail/gateway-server:latest
+```
+
+**라우트를 여는 것은 이미지와 무관합니다.** 라우팅 규칙이 `config` 저장소에 있으므로 그쪽을 고치고 설정을 다시 읽게 하면 됩니다. 이미지를 다시 만들어야 하는 것은 필터나 의존성이 바뀐 경우뿐입니다.
+
+```powershell
+curl.exe -X POST http://localhost:8080/actuator/refresh
+```
+
+**개발 도구에서 띄운 도메인 서비스도 이 서비스가 찾아냅니다.** 그쪽은 `local` 프로파일로 동작해 `host.docker.internal` 로 유레카에 등록되는데, 이 이름은 컨테이너 안에서도 호스트를 가리키므로 양쪽에서 통합니다.
+
+### 2-4. 기동 순서
 
 ```
 config-server  →  eureka-server  →  gateway-server  →  도메인 서비스 14개
 ```
 
 도메인 서비스보다 먼저 떠도 됩니다. 라우트에 적힌 서비스가 없으면 그 경로만 503이 되고 나머지는 정상입니다.
+
+컨테이너에서는 Compose가 앞의 둘을 기다려 주므로 순서를 신경 쓰지 않아도 됩니다.
 
 ---
 
