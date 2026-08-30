@@ -1,0 +1,66 @@
+# =============================================================================
+# 테스트 전용 설정
+# =============================================================================
+# 이 파일이 있으면 테스트에서는 이것이 쓰이고 src/main 쪽 application.yml 은 무시됩니다.
+# 테스트 클래스패스가 앞서기 때문입니다.
+#
+# 이 파일이 없으면 contextLoads 가 설정 서버의 기동 여부에 따라 성공하기도 하고
+# 실패하기도 합니다. 본문 설정에 optional: 이 붙어 있어 설정을 못 받아도 조용히
+# 넘어가는데, 그러면 공개키가 비어 애플리케이션이 뜨지 못합니다.
+#
+# * 설정 클라이언트를 끄는 줄이 반드시 필요합니다
+#   이 파일이 src/main 쪽을 가리면서 spring.config.import 줄까지 함께 사라지는데,
+#   설정 클라이언트는 그 줄이 없는 것 자체를 오류로 봅니다.
+#   "설정 서버를 쓸 것인데 어디서 받을지를 안 적었다" 를 잡으려는 장치입니다.
+#   끄지 않으면 ConfigDataMissingEnvironmentPostProcessor 에서 기동이 막힙니다.
+#
+# * 여기 공개키는 형식이 맞는 값이면 됩니다
+#   테스트는 컨텍스트가 뜨는지만 보고 실제 토큰을 검증하지 않습니다
+#   공개키는 서명을 만들 수 없고 확인만 되므로 저장소에 있어도 무해합니다
+# =============================================================================
+
+spring:
+  application:
+    name: gateway-server
+
+  cloud:
+    config:
+      # 테스트에서는 설정 서버를 쓰지 않습니다
+      # 위 주석의 import 검사도 이 줄로 함께 비활성화됩니다
+      enabled: false
+
+app:
+  jwt:
+    public-key: |
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm/Q19Fe36WoGyLuQpl+i
+      leM6J7HrN4xnHrg8Ip7G13uMlYAUbZTZW4myNIalTnzacMHUkAmyW2SutH3ONp9s
+      65ECsIOrnlxsHaJXqyQn9fzNb9emazJ5DCmE519OFGvR6auk709HCNhY1gdbeiTq
+      xEg0Oyk5lH7sluWrNkYvTMFNRcwspRD7OX0sRfz3CdKKvh/DSUxUYNOp2Yr/87v1
+      +D3+MFkgnPHIGxSbGTr5aAFVCWfKzrL6hQXpvLbpj7Yj9/yC2SSHxkNLzSGZs/EY
+      nO9giPhXk5AXOuQOlkk8JBINAGvo8O1CaHxkVF3f7I4Si7yCnUltGtcQIjgpYBVI
+      oQIDAQAB
+      -----END PUBLIC KEY-----
+    claim:
+      account-id: sub
+      role: role
+
+  gateway:
+    # 목록이 비어 있지만 않으면 됩니다
+    # 라우팅 동작은 실제 기동에서 확인하며 여기서는 빈이 만들어지는지만 봅니다
+    permit-all:
+      - /api/v1/auth/login
+
+# 서비스 레지스트리를 찾지 않도록 끕니다
+# 켜 두면 테스트마다 등록을 시도하다 실패해 로그가 길어지고 기동이 느려집니다
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+# 추적 전송도 끕니다
+# 수집기가 없으면 전송 실패가 반복되며 테스트에는 필요하지 않습니다
+management:
+  tracing:
+    enabled: false
