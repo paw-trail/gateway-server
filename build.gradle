@@ -109,3 +109,17 @@ dependencyManagement {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// 실행 가능 jar 하나만 만듦
+// 켜 두면 -plain.jar 가 함께 생기는데, 클래스만 든 4KB 짜리라 실행되지 않음
+//
+// * Dockerfile 이 COPY build/libs/*.jar 로 받으므로 둘이 있으면 어느 쪽이 담길지가
+//   빌드 도구의 파일 정렬 순서에 달림
+//   지금은 우연히 실행 가능한 쪽이 뒤에 와서 동작하나, 이름이 조금만 달라져도 뒤집힘
+//   기동에 실패해야 드러나므로 이미지를 만드는 시점에는 알 수 없음
+//
+// * 공통 모듈은 반대로 이것을 켜고 bootJar 를 끔
+//   그쪽은 실행되는 앱이 아니라 다른 프로젝트가 의존성으로 쓰는 라이브러리이기 때문임
+tasks.named('jar') {
+    enabled = false
+}
