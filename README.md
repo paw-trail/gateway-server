@@ -197,7 +197,7 @@ spring:
 | 계층 | 파일 | 이 서비스가 받는 값 |
 |:---:|---|---|
 | 1 | `application.yml` | 액추에이터 노출 범위, graceful shutdown, 로깅 레벨 |
-| 2 | `gateway-server.yml` | 포트 8080, **라우팅 규칙**, **공개키**, **인증 예외 목록** |
+| 2 | `gateway-server.yml` | 포트 8080, **라우팅 규칙**, **공개키와 토큰 항목 이름**, **인증 예외 목록**, 액추에이터 노출 |
 | 3 | `application-{env}.yml` | 유레카 주소, Loki · Zipkin 주소 |
 
 ### 5-1. 라우팅 규칙을 설정으로 둔 이유
@@ -259,7 +259,46 @@ curl.exe http://localhost:8080/actuator/gateway/routes
 Using generated security password: ...
 ```
 
-토큰 검증 라이브러리가 보안 모듈을 함께 데려오면서 기본 보안 설정이 켜진 것입니다. 이 서비스는 자체 필터로 인증을 처리하므로 **기본 설정을 비활성화하는 빈이 있어야 합니다.** 그것이 빠지면 모든 요청이 막힙니다.
+**보안 프레임워크의 기본 설정이 켜진 것이며, 정상 상태에서는 이 줄이 나오지 않습니다.**
+
+이 서비스는 토큰 검증에 필요한 부분만 쓰고 보안 프레임워크 전체를 얹지 않습니다. 그 의존성은 웹 계층 모듈을 가져오지 않으므로 기본 설정이 켜질 조건을 만족하지 않습니다.
+
+이 줄이 보인다면 **누군가 `spring-boot-starter-security` 를 추가한 것입니다.** 그러면 모든 요청이 인증을 요구하게 되고, 그것을 다시 끄는 설정을 따로 두어야 합니다. 인증은 이미 자체 필터가 처리하므로 그 의존성을 되돌리는 편이 맞습니다.
+
+### `/actuator/gateway/routes` 가 404 입니다
+
+**노출 목록에 넣는 것만으로는 켜지지 않습니다.** 대부분의 액추에이터 항목은 접근 권한이 기본으로 열려 있지만, 이 항목은 라우팅 구조가 통째로 드러나는 자리라 예외입니다. 권한을 주지 않으면 **등록조차 되지 않아** `/actuator` 목록에도 나타나지 않습니다.
+
+기동 로그의 아래 줄이 판별 지문입니다. **5가 아니라 4라면 이것입니다.**
+
+```
+Exposing 5 endpoints beneath base path '/actuator'
+```
+
+`config` 저장소의 `gateway-server.yml` 에 아래가 있는지 확인합니다.
+
+```yaml
+management:
+  endpoint:
+    gateway:
+      access: unrestricted
+```
+
+**`/actuator/refresh` 로는 반영되지 않습니다.** 항목의 등록은 기동할 때 일어나므로 다시 띄워야 합니다.
+
+### 토큰이 있는데 401 이 납니다
+
+로그의 내용에 따라 원인이 갈립니다.
+
+| 로그 | 원인 |
+|---|---|
+| `토큰 쿠키가 없습니다` | 쿠키 이름이 `access_token` 인지, 브라우저가 쿠키를 보내고 있는지 |
+| `토큰 검증에 실패했습니다` | 서명 불일치 · 만료 · 형식 오류. 아래 3-5 참고 |
+| `토큰에 필요한 값이 없습니다` | **인증 서비스가 넣는 이름과 설정의 이름이 다릅니다** |
+
+마지막 경우는 서명은 맞는데 안에서 값을 못 찾은 것입니다. `app.jwt.claim` 의 두 값과 인증 서비스가 토큰에 넣는 이름이 같아야 합니다.
+
+서명 불일치는 **공개키와 개인키가 짝이 아닐 때** 납니다. 배포 환경에서 키를 새로 만들었다면 이 저장소가 아니라 `config` 저장소의 공개키도 함께 바꾸었는지 확인합니다.
 
 ### 기동에 실패하며 서블릿 관련 오류가 납니다
 
@@ -298,7 +337,18 @@ curl.exe -X POST http://localhost:8080/actuator/refresh
 ```
 gateway-server/
 ├── src/main/java/com/pawtrail/gatewayserver/
-│   └── GatewayServerApplication.java
+│   ├── GatewayServerApplication.java
+│   ├── config/
+│   │   ├── JwtProperties.java           공개키와 토큰 항목 이름
+│   │   ├── GatewayAuthProperties.java   인증 없이 여는 경로 목록
+│   │   └── JwtDecoderConfig.java        토큰 검증기, RS256 고정
+│   ├── filter/
+│   │   ├── AuthenticationFilter.java    ⓐ~ⓖ 를 순서대로 처리
+│   │   └── GatewayErrorHandler.java     404 · 503 을 응답 규약에 맞춤
+│   └── response/
+│       ├── GatewayApiResponse.java      {code, message, data, traceId}
+│       ├── GatewayErrorCode.java        401 · 403 · 404 · 503 · 500
+│       └── ErrorResponseWriter.java     응답을 직접 써 내려 줌
 ├── src/main/resources/
 │   ├── application.yml                  세 줄 (이름 · 설정 서버 주소 · 기본 프로파일)
 │   └── logback-spring.xml               콘솔과 Loki appender
