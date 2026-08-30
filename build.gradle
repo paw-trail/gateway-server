@@ -1,0 +1,106 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.1.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.pawtrail'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "2025.1.3")
+}
+
+dependencies {
+    // ── Spring Cloud ──────────────────────────────────────────
+    // API 게이트웨이 본체임
+    //
+    // * 아티팩트 이름이 Spring Cloud 2025.1 에서 바뀌었음
+    //     예전    spring-cloud-starter-gateway
+    //     지금    spring-cloud-starter-gateway-server-webflux   (리액티브)
+    //             spring-cloud-starter-gateway-server-webmvc    (서블릿)
+    //   프로퍼티 접두사도 spring.cloud.gateway.server.webflux.* 로 바뀌었으며
+    //   옛 접두사를 쓰면 오류 없이 무시되므로 설정이 안 먹을 때 이것부터 볼 것
+    //
+    // * Initializr 목록에서는 이름이 뒤집혀 보임
+    //     Gateway            → webmvc  ("Servlet-based applications")
+    //     Reactive Gateway   → webflux ("reactive applications")   ← 우리가 고른 것
+    //   예전에는 Gateway 가 곧 리액티브였으므로 옛 감각으로 고르면 반대를 고르게 됨
+    //
+    // * 이 서비스는 WebFlux 로 돎
+    //   spring-boot-starter-webmvc 가 클래스패스에 끼면 기동에 실패하므로
+    //   의존성을 추가할 때 서블릿 스타터를 물고 오지 않는지 확인할 것
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway-server-webflux'
+
+    // 라우팅 규칙과 공개키를 config 저장소(paw-trail/config)에서 받음
+    // 라우트를 열 때 이미지 재빌드 없이 push + /actuator/refresh 로 끝나는 것이
+    // 규칙을 이 저장소가 아니라 config 에 둔 이유임
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
+    // uri: lb://<서비스명> 을 실제 주소로 바꿔 주는 쪽임
+    // 라우트를 자동 생성(discovery locator)하지는 않고 주소 조회에만 씀
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    // ── 인증 ──────────────────────────────────────────────────
+    // 쿠키에 실려 온 JWT 의 서명을 검증하는 데에만 씀
+    // NimbusReactiveJwtDecoder 하나만 쓰고 Security 필터 체인은 얹지 않음
+    // 검증 흐름 자체는 GlobalFilter 에 있음
+    //
+    // * 이것을 넣으면 spring-security-core 가 전이로 딸려옴
+    //   그러면 Boot 의 자동 설정이 조건을 만족해 기본 보안 체인이 뜨고
+    //   설정한 적이 없는데도 전 요청이 인증을 요구하게 됨
+    //   기동 로그에 generated security password 가 찍히는 것이 그 지문임
+    //   그래서 "게이트웨이는 자기 체인을 쓰지 않는다" 를 명시하는 빈이 하나 필요함
+    //
+    // * PEM 문자열을 RSAPublicKey 로 바꿔 주는 변환기도 이 안에 있음
+    //   공개키를 config 저장소에 원본 그대로 두기로 한 것과 짝임
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+
+    // ── 상태확인 · 관측 ───────────────────────────────────────
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // actuator 만으로는 /actuator/prometheus 가 생기지 않음
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    // 분산 추적임
+    // 이 서비스가 요청이 처음 들어오는 자리이므로 여기서 추적이 시작되지 않으면
+    // 뒤쪽 서비스들이 각자 새 trace 를 만들어 요청 하나가 여러 갈래로 쪼개짐
+    // 장소 상세처럼 브라우저가 여러 개를 한꺼번에 부르는 화면에서 특히 문제가 됨
+    //
+    // 전송 주소는 config 저장소의 application-{env}.yml 에서 내려옴
+    // 나중에 nginx 가 traceparent 를 넣어 주면 그것을 이어받고
+    // 없으면 새로 만드는 것이 W3C 규약이라 중복으로 생기지 않음
+    implementation 'org.springframework.boot:spring-boot-starter-zipkin'
+
+    // ── 로깅 ──────────────────────────────────────────────────
+    // 공통 모듈을 의존하지 않으므로 직접 선언함
+    // 플랫폼 3종이 common 을 쓰지 않는 이유는 README 4장을 참고
+    implementation "com.github.loki4j:loki-logback-appender:${lokiVersion}"
+
+    // ── 테스트 ────────────────────────────────────────────────
+    // Boot 4 에서 테스트 스타터가 모듈별로 갈림
+    // contextLoads 가 실패하면 무엇이 부족한지 보고 더할 것
+    testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

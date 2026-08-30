@@ -1,0 +1,45 @@
+# =============================================================================
+# gateway-server
+# =============================================================================
+# 이 파일에는 세 줄만 둠
+# 나머지 설정은 전부 config 저장소(paw-trail/config)에서 내려옴
+#   포트 · 라우팅 규칙 · 공개키 · 인증 예외 목록    gateway-server.yml
+#   주소(유레카 · Loki · Zipkin 등)                application-{env}.yml
+#   공통 동작                                     application.yml
+#
+# * config 저장소로 옮긴 값을 여기에 남겨 두지 말 것
+#   같은 키가 두 곳에 있으면 어느 쪽이 이기는지 매번 확인해야 함
+#
+# * 라우팅 규칙을 이 저장소가 아니라 config 에 둔 이유
+#   도메인 서비스가 하나씩 완성될 때마다 라우트를 열어야 하는데
+#   여기에 있으면 그때마다 이미지 재빌드와 무중단 배포 한 사이클을 돌게 됨
+#   config 에 있으면 push 와 /actuator/refresh 로 끝남
+# =============================================================================
+
+spring:
+
+  # config 저장소에서 이 이름의 파일을 찾음
+  # 저장소명 · 컨테이너 이미지명 · 유레카 등록 이름과도 같아야 함
+  application:
+    name: gateway-server
+
+  # 설정을 받아 올 곳임
+  #
+  # optional: 이 붙어 있으면 config-server 가 떠 있지 않아도 기동됨
+  # * 이 서비스는 원래 포트가 8080 이라 유레카와 달리 포트로 판별되지 않음
+  #   설정을 못 받아도 8080 에 그대로 뜨고 라우트만 비어 404 만 돌려줌
+  #   그때는 /actuator/gateway/routes 가 비어 있는 것으로 가려낼 것
+  #
+  # 주소에 기본값을 붙이는 것은 의도임
+  # 로컬은 언제나 localhost:8888 이므로 기본값이 정답이고
+  # 없으면 각자 IntelliJ 실행 구성에 환경변수를 넣어야 함
+  # 컨테이너와 AWS 에서만 CONFIG_HOST 를 지정해 덮어씀
+  config:
+    import: "optional:configserver:http://${CONFIG_HOST:localhost}:8888"
+
+  # 아무도 프로파일을 지정하지 않으면 local 로 봄
+  # active 가 아니라 default 인 것이 중요함
+  #   active  는 강제라 컨테이너에서 덮어쓸 때 헷갈림
+  #   default 는 안 정해주면 local 이라 컨테이너의 SPRING_PROFILES_ACTIVE=dev 가 이김
+  profiles:
+    default: local
