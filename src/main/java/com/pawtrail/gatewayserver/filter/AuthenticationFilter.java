@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
  *
  * 지나가는 순서는 아래와 같으며 각 단계의 이유는 해당 위치에 적었음
  *   들어온 인증 헤더 제거 → 열어 둔 경로인가 → 토큰 꺼내기
- *   → 서명 확인 → 사용자 정보 꺼내기 → 관리자 권한 → 헤더 주입
+ *   → 서명 확인 → 토큰 종류 확인 → 사용자 정보 꺼내기 → 관리자 권한 → 헤더 주입
  */
 @Component
 public class AuthenticationFilter implements GlobalFilter, Ordered {
@@ -44,6 +44,17 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private static final String ACCESS_TOKEN_COOKIE = "access_token";
     private static final String ADMIN_PATH_PREFIX = "/api/v1/admin/";
     private static final String ADMIN_ROLE = "ADMIN";
+
+    // 이 게이트웨이가 받아들이는 토큰의 종류임
+    //
+    // 인증 서비스가 토큰에 넣는 값과 같은 문자열이어야 함
+    // 그쪽은 열거형으로 두고 있으나 공통 모듈을 쓰지 않아 함께 쓸 수 없음
+    // 인증 예외 경로 목록이나 토픽 이름과 같은 성격의 중복이며 감수한 것임
+    //
+    // 설정으로 빼지 않은 것은 의도임
+    // claim 의 이름은 환경마다 달라질 수 있어 설정이지만
+    // 그 안에 담기는 값은 두 서비스 사이의 규약이라 코드에 두는 것이 맞음
+    private static final String ACCESS_TOKEN_TYPE = "access";
 
     private final ReactiveJwtDecoder jwtDecoder;
     private final ErrorResponseWriter errorResponseWriter;
@@ -125,6 +136,24 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private Mono<Void> authenticate(ServerWebExchange exchange, GatewayFilterChain chain,
                                     Jwt jwt, String path) {
+
+        // 토큰의 종류를 먼저 봄
+        //
+        // * 이 검사가 없으면 리프레시 토큰을 이 쿠키에 넣어 쓸 수 있음
+        //   두 토큰은 담는 내용이 같고 수명만 달라 서명과 만료만으로는 구분이 안 됨
+        //   그러면 갱신 경로를 한 번도 거치지 않고 14일간 쓰이며,
+        //   그 사이 토큰 교체도 재사용 탐지도 계정의 폐기 기준 시각도 지나침
+        //   비밀번호를 바꿔도 그 경로는 끊기지 않음
+        //
+        // * 종류가 없는 토큰도 여기서 걸림
+        //   인증 서비스가 이 값을 넣기 전에 발급된 토큰이며 더는 받지 않음
+        //   액세스 토큰의 수명이 짧아 그런 토큰은 곧 사라짐
+        String tokenType = jwt.getClaimAsString(jwtProperties.claim().type());
+
+        if (!ACCESS_TOKEN_TYPE.equals(tokenType)) {
+            log.debug("액세스 토큰이 아닙니다. path={}, type={}", path, tokenType);
+            return errorResponseWriter.write(exchange, GatewayErrorCode.AUTHENTICATION_FAILED);
+        }
 
         String accountId = jwt.getClaimAsString(jwtProperties.claim().accountId());
         String role = jwt.getClaimAsString(jwtProperties.claim().role());

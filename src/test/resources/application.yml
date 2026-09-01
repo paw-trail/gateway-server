@@ -44,6 +44,11 @@ app:
     claim:
       account-id: sub
       role: role
+      # 토큰의 종류가 든 이름입니다
+      #
+      # JwtProperties 가 값이 비면 기동을 막으므로 여기에 없으면 contextLoads 가 실패합니다
+      # auth-service 및 config 저장소의 gateway-server.yml 과 같은 값이어야 합니다
+      type: typ
 
   gateway:
     # 목록이 비어 있지만 않으면 됩니다
