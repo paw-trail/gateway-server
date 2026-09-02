@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="760" viewBox="0 0 1500 760" font-family="Noto Sans CJK KR, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif">
+<defs><marker id="ah-374151" markerWidth="11" markerHeight="9" refX="10" refY="4.5" orient="auto"><path d="M0,0 L11,4.5 L0,9 z" fill="#374151"/></marker><marker id="as-374151" markerWidth="11" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M11,0 L0,4.5 L11,9 z" fill="#374151"/></marker><marker id="ah-3B82F6" markerWidth="11" markerHeight="9" refX="10" refY="4.5" orient="auto"><path d="M0,0 L11,4.5 L0,9 z" fill="#3B82F6"/></marker><marker id="as-3B82F6" markerWidth="11" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M11,0 L0,4.5 L11,9 z" fill="#3B82F6"/></marker><marker id="ah-6366F1" markerWidth="11" markerHeight="9" refX="10" refY="4.5" orient="auto"><path d="M0,0 L11,4.5 L0,9 z" fill="#6366F1"/></marker><marker id="as-6366F1" markerWidth="11" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M11,0 L0,4.5 L11,9 z" fill="#6366F1"/></marker><marker id="ah-16A34A" markerWidth="11" markerHeight="9" refX="10" refY="4.5" orient="auto"><path d="M0,0 L11,4.5 L0,9 z" fill="#16A34A"/></marker><marker id="as-16A34A" markerWidth="11" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M11,0 L0,4.5 L11,9 z" fill="#16A34A"/></marker><marker id="ah-F97316" markerWidth="11" markerHeight="9" refX="10" refY="4.5" orient="auto"><path d="M0,0 L11,4.5 L0,9 z" fill="#F97316"/></marker><marker id="as-F97316" markerWidth="11" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M11,0 L0,4.5 L11,9 z" fill="#F97316"/></marker><marker id="ah-A855F7" markerWidth="11" markerHeight="9" refX="10" refY="4.5" orient="auto"><path d="M0,0 L11,4.5 L0,9 z" fill="#A855F7"/></marker><marker id="as-A855F7" markerWidth="11" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M11,0 L0,4.5 L11,9 z" fill="#A855F7"/></marker><marker id="ah-9CA3AF" markerWidth="11" markerHeight="9" refX="10" refY="4.5" orient="auto"><path d="M0,0 L11,4.5 L0,9 z" fill="#9CA3AF"/></marker><marker id="as-9CA3AF" markerWidth="11" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M11,0 L0,4.5 L11,9 z" fill="#9CA3AF"/></marker><marker id="ah-D97706" markerWidth="11" markerHeight="9" refX="10" refY="4.5" orient="auto"><path d="M0,0 L11,4.5 L0,9 z" fill="#D97706"/></marker><marker id="as-D97706" markerWidth="11" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M11,0 L0,4.5 L11,9 z" fill="#D97706"/></marker><marker id="ah-111827" markerWidth="11" markerHeight="9" refX="10" refY="4.5" orient="auto"><path d="M0,0 L11,4.5 L0,9 z" fill="#111827"/></marker><marker id="as-111827" markerWidth="11" markerHeight="9" refX="1" refY="4.5" orient="auto"><path d="M11,0 L0,4.5 L11,9 z" fill="#111827"/></marker></defs><rect width="1500" height="760" fill="#FFFFFF"/>
+<rect x="572.0" y="322.0" width="356" height="116" rx="18" fill="none" stroke="#3B82F6" stroke-width="3" opacity="0.5"/>
+<rect x="580.0" y="330.0" width="340" height="100" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="3.5"/>
+<text x="750" y="358" font-size="22" font-weight="bold" text-anchor="middle" fill="#111827">gateway-server  :8080</text>
+<text x="750" y="378" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">JWT 검증 · 라우팅 · 헤더 주입</text>
+<text x="750" y="394" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">WebFlux · 상태 없음</text>
+<text x="572.0" y="316.0" font-size="13" font-weight="bold" text-anchor="start" fill="#3B82F6">이 레포</text>
+<rect x="60.0" y="140.0" width="240" height="80" rx="12" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="2.2"/>
+<text x="180" y="166" font-size="17" font-weight="bold" text-anchor="middle" fill="#111827">브라우저</text>
+<text x="180" y="186" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">쿠키에 JWT</text>
+<rect x="60.0" y="340.0" width="240" height="80" rx="12" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="2.2" stroke-dasharray="9,7"/>
+<text x="180" y="366" font-size="17" font-weight="bold" text-anchor="middle" fill="#111827">nginx</text>
+<text x="180" y="386" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">예정</text>
+<rect x="600.0" y="80.0" width="300" height="80" rx="12" fill="#E0E7FF" stroke="#6366F1" stroke-width="2.2"/>
+<text x="750" y="106" font-size="17" font-weight="bold" text-anchor="middle" fill="#111827">config-server  :8888</text>
+<text x="750" y="126" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">라우트 19 · 공개키 · permit-all 9</text>
+<rect x="1150.0" y="80.0" width="300" height="80" rx="12" fill="#E0E7FF" stroke="#6366F1" stroke-width="2.2"/>
+<text x="1300" y="106" font-size="17" font-weight="bold" text-anchor="middle" fill="#111827">eureka-server  :8761</text>
+<text x="1300" y="126" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">이름 → 주소</text>
+<rect x="1150.0" y="325.0" width="300" height="110" rx="12" fill="#DCFCE7" stroke="#22C55E" stroke-width="2.2"/>
+<text x="1300" y="358" font-size="17" font-weight="bold" text-anchor="middle" fill="#111827">도메인 서비스 14개</text>
+<text x="1300" y="378" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">auth · user · pet · place …</text>
+<text x="1300" y="394" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">헤더만 믿고 토큰은 안 봄</text>
+<rect x="1150.0" y="580.0" width="300" height="80" rx="12" fill="#F3E8FF" stroke="#A855F7" stroke-width="2.2"/>
+<text x="1300" y="606" font-size="17" font-weight="bold" text-anchor="middle" fill="#111827">Zipkin</text>
+<text x="1300" y="626" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">추적이 여기서 시작됨</text>
+<rect x="50.0" y="580.0" width="260" height="80" rx="12" fill="#DCFCE7" stroke="#22C55E" stroke-width="2.2"/>
+<text x="180" y="606" font-size="17" font-weight="bold" text-anchor="middle" fill="#111827">auth-service</text>
+<text x="180" y="626" font-size="12" font-weight="normal" text-anchor="middle" fill="#4B5563">공개키의 짝인 개인키로 서명</text>
+<polyline points="300.0,180 580,180 580,340 580.0,380" fill="none" stroke="#3B82F6" stroke-width="2.4" marker-end="url(#ah-3B82F6)"/>
+<rect x="337" y="158" width="186" height="19" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="430" y="170" font-size="13" font-weight="normal" text-anchor="middle" fill="#3B82F6">① 모든 요청  (지금은 8080 직접)</text>
+<polyline points="300.0,380 580.0,380" fill="none" stroke="#9CA3AF" stroke-width="2.4" marker-end="url(#ah-9CA3AF)" stroke-dasharray="7,6"/>
+<rect x="423" y="360" width="34" height="19" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="440.0" y="372.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#9CA3AF">예정</text>
+<polyline points="750,160.0 750,330.0" fill="none" stroke="#6366F1" stroke-width="2.4" marker-end="url(#ah-6366F1)"/>
+<rect x="712" y="225" width="76" height="19" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="750.0" y="237.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#6366F1">기동 시 설정</text>
+<polyline points="920.0,380 1000,380 1000,120 1150.0,120" fill="none" stroke="#6366F1" stroke-width="2.4" marker-end="url(#ah-6366F1)"/>
+<rect x="935" y="238" width="131" height="19" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="1000" y="250" font-size="13" font-weight="normal" text-anchor="middle" fill="#6366F1">② "place 어디 있어?"</text>
+<polyline points="920.0,380 1150.0,380" fill="none" stroke="#16A34A" stroke-width="3.5" marker-end="url(#ah-16A34A)"/>
+<rect x="870" y="360" width="219" height="19" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="980" y="372" font-size="13" font-weight="normal" text-anchor="middle" fill="#16A34A">③ 라우팅  +  X-User-Id · X-User-Role</text>
+<polyline points="850,430 850,530 1300,530 1300,580.0" fill="none" stroke="#A855F7" stroke-width="2.4" marker-end="url(#ah-A855F7)" stroke-dasharray="7,6"/>
+<rect x="1021" y="510" width="118" height="19" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="1080" y="522" font-size="13" font-weight="normal" text-anchor="middle" fill="#A855F7">traceId 여기서 생성</text>
+<polyline points="180,580.0 180,530 650,530 650,430" fill="none" stroke="#D97706" stroke-width="2.4" marker-end="url(#ah-D97706)" stroke-dasharray="7,6"/>
+<rect x="311" y="510" width="218" height="19" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="420" y="522" font-size="13" font-weight="normal" text-anchor="middle" fill="#D97706">같은 키 쌍 (auth 개인키 · 여기 공개키)</text>
+<text x="40" y="720" font-size="13" font-weight="normal" text-anchor="start" fill="#4B5563">바깥에서 들어온 X-User-Id 는 여기서 지워짐 · permit-all 9줄은 auth 와 같은 목록 · 401 · 403 · 404 · 503 을 직접 냄</text>
+<text x="1476" y="748" font-size="11" text-anchor="end" fill="#9CA3AF">gateway-server 를 중심으로 · 직접 연결된 것만</text></svg>
